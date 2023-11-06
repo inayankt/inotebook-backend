@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const User = require("../models/User");
-const { default: mongoose } = require("mongoose");
 
 // Create a user: "POST /api/auth/". Doesn't require auth.
 router.post("/",[
