@@ -13,7 +13,7 @@ router.post("/",[
                 return Promise.reject("Email already in use.");
             }
         } catch(err) {
-            // This error occurs is database is not connected. We here resolve the validation so that we can handle the error and send proper response.
+            // This error occurs when database is not connected. We here resolve the validation so that we can handle the error and send proper response.
             return Promise.resolve();
         }
     }),
