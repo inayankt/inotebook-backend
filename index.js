@@ -3,7 +3,7 @@ const express = require("express");
 const connectToMongo = require("./db");
 
 const app = express();
-const port = parseInt(process.env.API_PORT);
+const port = parseInt(process.env.SERVER_PORT);
 
 // Connecting to MongoDB
 connectToMongo();
