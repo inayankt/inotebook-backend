@@ -85,7 +85,7 @@ router.post("/login", [
     }
 });
 
-// ROUTE 3: Get logged in user's details: "GET api/auth/user". Requires authentication
+// ROUTE 3: Get logged in user's details: "GET api/auth/user". Requires authentication.
 router.get("/user", authenticate, async (req, res) => {
     try {
         const id = req.user.id;
