@@ -3,11 +3,12 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const authenticate = require("../middlewares/authenticate");
 const User = require("../models/User");
 
 const jwt_secret = process.env.JWT_SECRET;
 
-// Create a user: "POST /api/auth/register". Doesn't require auth.
+// ROUTE 1: Create a user: "POST /api/auth/register". Doesn't require auth.
 router.post("/register", [
     body("email", "Please enter a valid email.").isEmail().custom(async (value) => {
         try {
@@ -43,8 +44,54 @@ router.post("/register", [
             }
         };
         const authToken = jwt.sign(data, jwt_secret);
-        res.status(200).json({status: "success", message: "User successfully created.", authToken: authToken});
+        res.status(200).json({status: "success", message: "User registered successfully.", authToken: authToken});
     } catch(err) {
+        console.log(err.message);
+        res.status(500).json({status: "error", message: "Some internal error occurred."});
+    }
+});
+
+
+// ROUTE 2: Authenticate a user: "POST /api/auth/login". Doesn't require auth.
+router.post("/login", [
+    body("email", "Please enter a valid email.").notEmpty().isEmail(),
+    body("password", "Please enter a valid password.").notEmpty()
+], async (req, res) => {
+    // If there are errors, return bad request and the errors array.
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({status: "error", message: errors.array()[0].msg});
+    }
+    // If no errors found.
+    try {
+        const user = await User.findOne({email: req.body.email});
+        if(!user) {
+            return res.status(400).json({status: "error", message: "Wrong credentials."});
+        }
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if(!match) {
+            return res.status(400).json({status: "error", message: "Wrong credentials."});
+        }
+        const data = {
+            user: {
+                id: user._id
+            }
+        };
+        const authToken = jwt.sign(data, jwt_secret);
+        res.status(200).json({status: "success", message: "User logged in successfully.", authToken: authToken});
+    } catch(err) {
+        console.log(err.message);
+        res.status(500).json({status: "error", message: "Some internal error occurred."});
+    }
+});
+
+// ROUTE 3: Get logged in user's details: "GET api/auth/user". Requires authentication
+router.get("/user", authenticate, async (req, res) => {
+    try {
+        const id = req.user.id;
+        const user = await User.findOne({_id: id}).select("-password");
+        res.status(200).json({status: "success", message: "Fetched user successfully.", user: user});
+    } catch {
         console.log(err.message);
         res.status(500).json({status: "error", message: "Some internal error occurred."});
     }
