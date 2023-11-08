@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticate = require("../middlewares/authenticate");
 const User = require("../models/User");
+const Note = require("../models/Note");
 
 const jwt_secret = process.env.JWT_SECRET;
 
@@ -121,6 +122,18 @@ router.patch("/user", authenticate, [
             new: true
         });
         res.status(200).json({status: "success", message: "User updated successfully.", user: updatedUser});
+    } catch(err) {
+        console.log(err.message);
+        res.status(500).json({status: "error", message: "Some internal error occurred."});
+    }
+});
+
+// ROUTE 5: Delete a user: "DELETE api/auth/user". Requires authentication.
+router.delete("/user", authenticate, async (req, res) => {
+    try {
+        await Note.deleteMany({user: req.user.id});
+        const deletedUser = await User.findByIdAndDelete(req.user.id);
+        res.status(200).json({status: "success", message: "Deleted user account successfully.", user: deletedUser});
     } catch(err) {
         console.log(err.message);
         res.status(500).json({status: "error", message: "Some internal error occurred."});
