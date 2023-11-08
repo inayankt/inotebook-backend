@@ -97,4 +97,34 @@ router.get("/user", authenticate, async (req, res) => {
     }
 });
 
+// ROUTE 4: Update user's details: "PATHC api/auth/user". Requires authentication.
+router.patch("/user", authenticate, [
+    body("email", "Please enter a valid email.").isEmail()
+], async (req, res) => {
+    // If there are errors, return bad request and the errors array.
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({status: "error", message: errors.array()[0].msg});
+    }
+    // If no errors found.
+    const {name, email} = req.body;
+    try {
+        const currUser = await User.findById(req.user.id);
+        const user = await User.findOne({email});
+        if(user && currUser.id != user.id) {
+            return res.status(400).json({status: "error", message: "Email already in use."});
+        }
+        let data = {};
+        if(name) data.name = name;
+        if(email) data.email = email;
+        const updatedUser = await User.findByIdAndUpdate(req.user.id, data, {
+            new: true
+        });
+        res.status(200).json({status: "success", message: "User updated successfully.", user: updatedUser});
+    } catch(err) {
+        console.log(err.message);
+        res.status(500).json({status: "error", message: "Some internal error occurred."});
+    }
+});
+
 module.exports = router;
