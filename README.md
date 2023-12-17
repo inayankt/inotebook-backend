@@ -32,4 +32,4 @@ The project folder will open in VS code. Make a new `.env` file which will conta
 node index.js
 ```
 
-The backend is now up and running on port `5000`. You can now start to setup the frontend part from [here](https://github.com/inayankt/inotebook-frontend/blob/main/README.md).
+The backend is now up and running on port `5000`. You can now start to setup the frontend part from [here](https://github.com/inayankt/inotebook-frontend/).
