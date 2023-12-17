@@ -6,6 +6,13 @@ This is the backend part of iNoteBook project.
 
 A web app where notes can be saved and retrieved from on the go. Users need to signin/signup with their account and can start saving notes.
 
+## Tech Stack
+
+- NodeJS
+- ExpressJS
+- MongoDB
+- JSON Web Token
+
 ## How to run the Express Rest API
 
 ### Prerequisites
